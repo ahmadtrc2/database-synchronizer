@@ -11,11 +11,11 @@ const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
 
-const {connectToLocalDatabase,connectToSourceDatabase} = require('./dbConfig');
+const { connectToLocalDatabase, connectToSourceDatabase } = require('./dbConfig');
 const sql = require('mssql');
 // dfg/
 const ipc = electron.ipcMain;
-
+// fghfghfxghdfghdfgh
 function createWindow() {
     const win = new BrowserWindow({
         icon: path.join(__dirname, "logo192.png"),
@@ -46,13 +46,13 @@ function createWindow() {
 
     async function executeQuery() {
         try {
-            const result = await sql.query('SELECT TOP 50 * FROM AllDatas'); 
+            const result = await sql.query('SELECT TOP 50 * FROM AllDatas');
 
             // console.log(result.recordset); 
             return result.recordset;
         } catch (err) {
             console.error('Error executing query:', err);
-        } 
+        }
     }
 
     executeQuery().then(result => {
@@ -66,7 +66,7 @@ function createWindow() {
 
 app.on("ready", async () => {
 
-    await connectToSourceDatabase("mola","1234")
+    await connectToSourceDatabase("mola", "1234")
     await connectToLocalDatabase()
 
     createWindow();
@@ -133,7 +133,7 @@ let lastCheckedId = 0;
 async function checkForNewDataAndSend(targetUrl) {
     try {
         let pool = await sql.connect(sqlConfig);
-        
+
         const result = await pool.request()
             .input('lastId', sql.Int, lastCheckedId)
             .query(`
@@ -141,9 +141,9 @@ async function checkForNewDataAndSend(targetUrl) {
                 WHERE Id > @lastId
                 ORDER BY Id ASC
             `);
-        
+
         const newRecords = result.recordset;
-        
+
         if (newRecords.length > 0) {
             for (let record of newRecords) {
                 try {
@@ -152,7 +152,7 @@ async function checkForNewDataAndSend(targetUrl) {
                             'Content-Type': 'application/json',
                         },
                     });
-                    
+
                     console.log(`Data sent successfully: ${record.Id}`);
                     electron.ipcRenderer.send('set:upload', record);
                     lastCheckedId = record.Id;
